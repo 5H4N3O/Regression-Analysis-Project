@@ -1,0 +1,1 @@
+shanePath <- "C:\\Users\\shane\\dev\\R Projects\\Regression-Analysis-Project\\Admission_Predict.csv"
