@@ -1,17 +1,17 @@
-GPA <- read.table("./Admission_Predict.csv", header = TRUE, sep = ",")
+Admission <- read.table("./Admission_Predict.csv", header = TRUE, sep = ",")
 
-GPA = GPA[,which(names(GPA) != "Serial.No.")] # remove serial.no.
+Admission = Admission[,which(names(Admission) != "Serial.No.")] # remove serial.no.
 library(dplyr) # for rename
-GPA = rename(GPA, c(GRE= "GRE.Score", TOEFL = "TOEFL.Score", UniRating = "University.Rating", Y = "Chance.of.Admit"))  
-GPA |> head()
+Admission = rename(Admission, c(GRE= "GRE.Score", TOEFL = "TOEFL.Score", UniRating = "University.Rating", Y = "Chance.of.Admit"))  
+Admission |> head()
 
 
-#write.csv(GPA, "./GPA.csv",row.names = FALSE)
+#write.csv(Admission, "./Admission.csv",row.names = FALSE)
 
 # Comparing the best 2 models comparing to exhaustive AIC search
-model_A = lm(data = GPA, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research)
-model_B = lm(data = GPA, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research + UniRating )
-full_model = lm(data = GPA, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research + UniRating + SOP)
+model_A = lm(data = Admission, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research)
+model_B = lm(data = Admission, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research + UniRating )
+full_model = lm(data = Admission, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research + UniRating + SOP)
 
 library(lme4) # for BIC
 
