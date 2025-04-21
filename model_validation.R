@@ -11,9 +11,12 @@ plot(model_A) # residuals vs. leverage looks fine
 
 # residuals not normal, use box=cox transformation
 library(EnvStats) #for boxcox
-bc = boxcox(model_A, lambda = seq(-3, 3, by = 0.1)) # use y^2 transformation?
-bc2 = boxcox(model_A, optimize = TRUE)
+bc = boxcox(model_A) # use y^2 transformation?
+bc2 = boxcox(model_A, lambda = seq(-5, 5, by = 0.1))
 plot.boxcox(bc)
+plot.boxcox(boxcox(model_A, lambda = seq(-8, 8, by = 0.1)))
+
+mod_A5 = lm(data = Admission, formula = I(Y^5) ~  GRE + TOEFL + LOR + CGPA + Research)
 
 #which.max(bc$y)
 #bc$x[100]
