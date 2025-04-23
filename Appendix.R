@@ -243,3 +243,81 @@ summary(poly_mod3.4)
 shapiro.test(poly_mod3.4$residuals)
 ncvTest(poly_mod3.4)
 # Even still, nonnormal, heteroskaditic errors
+
+# Further investiagtion done into outliers to see if omitting strong outliers 
+  # can significantly improve model fit
+# As plot show, points which weren't notable outliers in the original model may become
+ # strong outliers in new model
+
+
+p = 8
+n = 400
+
+# Outlying X obser.
+
+H = hatvalues(poly_mod3.4)
+(H > (2 * p / n)) |> which() |> unique() |> sort()
+H |> sort(decreasing = TRUE) |> head(20)
+#25  29  30  35  39  48  51  53  57  59  72  79  80  98 118 119 131 144 149 169 177 203 204 214 252 258
+#27 285 298 345 346 348 349 369 385 386 
+# ^ strongly influential X
+# 59 is by far strongest point here, 4x bigger h value than next highest
+
+dff = dffits(poly_mod3.4)
+(dff > (2*sqrt(p / n))) |> which() |> unique() |> sort()
+# 83 287 359 360
+
+dff[c(83, 287, 359, 360)]
+# 360 is very influential to fitted values
+
+cd = cooks.distance(poly_mod3.4)
+(qf(cd, p, n-p) > 0.5) |> which() # none :)
+
+dfb = dfbeta(poly_mod3.4)
+(dfb > (2/sqrt(n))) |> which() # none here :)
+
+# Per the plots, it looks like 66,67,69 are things throwing off residual vs. fitted and normal
+  # qq plot, look at Y outliers instead
+
+library(MASS) # for studentized residuals
+
+sr = studres(poly_mod3.4)
+rejection = qt(1 - 0.05/(2*n), n - p - 1)
+(abs(sr) > rejection) |> which() |> unique()
+# 69 is outlier wrt. y
+
+(abs(sr) > 3) |> which() |> unique() # using slightly lower rejection criteria
+# 66  67  69 116 360
+# try omitting these 5 points
+
+cubic_mod_omitOutliers = lm(formula = I(Y^5) ~ GRE + TOEFL + LOR + CGPA + Research + 
+                           I((TOEFL - mean(TOEFL))^2) + I((CGPA - mean(CGPA))^2) + I((CGPA - mean(CGPA))^3), 
+                                  data = Admission[-c( 66,  67  ,69, 116, 360), ])
+
+shapiro.test(cubic_mod_omitOutliers$residuals) # 0.09864
+ncvTest(cubic_mod_omitOutliers) # 0.00068006
+# Heteroskedasticity still present, but residuals are now reasonably normal
+ # weighting can now be applied to model
+
+
+# Model Weighting
+
+res = cubic_mod_omitOutliers$residuals
+fitted = cubic_mod_omitOutliers$fitted.values
+mod = lm(formula = abs(res) ~ fitted)
+
+var = mod$fitted.values^2
+w.i = 1/var
+
+cubic.wls = lm(formula = I(Y^5) ~ GRE + TOEFL + LOR + CGPA + Research + 
+                 I((TOEFL - mean(TOEFL))^2) + I((CGPA - mean(CGPA))^2) + I((CGPA - mean(CGPA))^3),
+               data = Admission[-c( 66,  67  ,69, 116, 360), ],
+               weights = w.i)
+summary(cubic.wls)
+plot(cubic.wls)
+
+shapiro.test(cubic.wls$residuals) # 0.2
+ncvTest(cubic.wls) # 0.41676
+# So, this weighted cubic model does meet assumptions of regression :)
+
+
