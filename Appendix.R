@@ -649,3 +649,45 @@ quantile(predicted_values$`No Research`, probs = c(alpha/2, 1 - alpha / 2))
 (c(0.2128977, 0.2486968  )^(1/5)) |> round(4) #  0.7339 0.7571
 
 ggarrange(plot_research, plot_no_research, nrow = 2)
+
+## Plot of both at once
+
+double_plot = ggplot(data = predicted_values, aes(x = value, fill = key)) +
+  theme_classic() +
+ # geom_histogram(aes(x = Research^(1/5)), fill = "red", position="identity", alpha=0.5, bins = 100) +
+  #geom_histogram(aes(x = `No Research`^(1/5)), fill = "blue", position="identity", alpha=0.5, bins = 100) 
+  geom_density(aes(x = Research^(1/5)), fill = "red", position="identity", alpha=0.5) +
+  geom_density(aes(x = `No Research`^(1/5)), fill = "blue", position="identity", alpha=0.5) +
+  scale_y_continuous(expand = c(0,0), labels = c()) +
+  scale_x_continuous(limits = c(0.728, 0.7825),breaks = c(0.73,0.74,0.75,.76,0.77,.78)) +
+  labs(title = "Predicted Acceptance Probabilities",
+       y = "Density",
+       x = "Probability of Acceptance") +
+  theme(plot.title = element_text(size = 20, hjust = 0.5),     
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 15))
+double_plot
+
+library(tidyr) # for gather
+
+double_plot2 = ggplot(data = gather(predicted_values^(1/5)), aes(x = value, fill = key)) +
+  theme_classic() + 
+  geom_density(alpha = 0.5) + 
+  scale_y_continuous(expand = c(0,0), labels = c()) +
+  scale_x_continuous(limits = c(0.728, 0.7825),breaks = c(0.73,0.74,0.75,.76,0.77,.78)) +
+  labs(title = "Predicted Acceptance Probabilities",
+       y = "Density",
+       x = "Probability of Acceptance",
+       fill = "") +
+  scale_fill_manual(values = c("#20DFAB","#DF2054")) +
+  theme(plot.title = element_text(size = 20, hjust = 0.5),     
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.title.y = element_text(size = 15),
+        legend.title = element_text(size=13),
+        legend.text = element_text(size=13),
+        legend.position = c(0.9,0.92))
+double_plot2
