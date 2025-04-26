@@ -7,6 +7,14 @@ Admission = rename(Admission,
                    c(GRE= "GRE.Score", TOEFL = "TOEFL.Score", UniRating = "University.Rating", Y = "Chance.of.Admit"))  
 Admission |> head()
 
+library(corrplot) # for corrplot
+library(regclass) # for VIF
+
+M = cor(Admission)
+corrplot(M, method = 'square', order = 'alphabet', type = 'lower')
+
+full_model = lm(data = Admission, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research + UniRating + SOP)
+VIF(full_model) |> round(3)
 
 # Model Selection
 
