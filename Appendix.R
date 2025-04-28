@@ -16,6 +16,44 @@ corrplot(M, method = 'square', order = 'alphabet', type = 'lower')
 full_model = lm(data = Admission, formula = Y ~  GRE + TOEFL + LOR + CGPA + Research + UniRating + SOP)
 VIF(full_model) |> round(3)
 
+
+library(ggplot2)
+library(ggpubr)
+
+scatter_gre = ggplot(data = Admission, aes(x = CGPA, y = GRE)) +
+  geom_point(size = 2.5) +
+  theme_classic() +
+  labs(x = "CGPA",
+       y = "GRE Score") +
+  theme(plot.title = element_text(size = 20, hjust = 0.5),     
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 17),
+        axis.title.y = element_text(size = 17))
+scatter_TOEFL = ggplot(data = Admission, aes(x = CGPA, y = TOEFL)) +
+  geom_point(size = 2.5) +
+  theme_classic() +
+  labs(x = "CGPA",
+       y = "TOEFL Score") +
+  theme(plot.title = element_text(size = 20, hjust = 0.5),     
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 17),
+        axis.title.y = element_text(size = 17))
+scatter_LOR = ggplot(data = Admission, aes(x = CGPA, y = LOR)) +
+  geom_point(size = 2.5) +
+  theme_classic() +
+  labs(x = "CGPA",
+       y = "Letter of Recommendation Strength") +
+  theme(plot.title = element_text(size = 20, hjust = 0.5),     
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 17),
+        axis.title.y = element_text(size = 17))
+
+ggarrange(scatter_gre,scatter_TOEFL, nrow = 1)
+
+
 # Model Selection
 
 library(ExhaustiveSearch)
